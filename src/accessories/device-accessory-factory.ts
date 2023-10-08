@@ -23,6 +23,8 @@ export function createAccessoryForDevice(device: Device, platform: HubspacePlatf
             return new FanAccessory(platform, accessory);
         case DeviceType.Outlet:
             return new OutletAccessory(platform, accessory);
+        case DeviceType.Switch:
+            return new OutletAccessory(platform, accessory);
         default:
             throw new Error(`Accessory of type '${device.type}' is not supported.`);
     }
