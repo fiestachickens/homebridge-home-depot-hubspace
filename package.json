@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Hubspace by Home Depot",
   "name": "homebridge-home-depot-hubspace",
-  "version": "1.0.1",
+  "version": "1.0.1.1",
   "description": "Homebridge plugin for controlling Home Depot Hubspace accessories.",
   "homepage": "https://github.com/fiestachickens/homebridge-home-depot-hubspace#readme",
   "author": "Adam Simonicek - Forked by Cyrus Keck",
