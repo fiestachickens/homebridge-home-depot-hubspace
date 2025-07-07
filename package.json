@@ -1,7 +1,7 @@
 {
   "name": "homebridge-home-depot-hubspace",
   "displayName": "Homebridge Hubspace by Home Depot",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "Homebridge plugin for controlling Hubspace accessories.",
   "homepage": "https://github.com/fiestachickens/homebridge-home-depot-hubspace",
   "author": "Cyrus Keck",
@@ -17,19 +17,8 @@
     "url": "https://github.com/fiestachickens/homebridge-home-depot-hubspace/issues"
   },
   "engines": {
-    "homebridge": ">=1.6.0",
-    "node": ">=18.0.0"
-  },
-  "homebridgePlugin": {
-    "platforms": [
-      {
-        "platform": "Hubspace",
-        "plugin_map": {
-          "plugin_name": "homebridge-home-depot-hubspace",
-          "singular": true
-        }
-      }
-    ]
+    "homebridge": "^1.6.0 || ^2.0.0-beta.0",
+    "node": "^18.20.4 || ^20.15.1 || ^22"
   },
   "main": "dist/index.js",
   "scripts": {
@@ -58,5 +47,16 @@
     "rimraf": "^4.4.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
+  },
+  "homebridgePlugin": {
+    "platforms": [
+      {
+        "platform": "Hubspace",
+        "plugin_map": {
+          "plugin_name": "homebridge-home-depot-hubspace",
+          "singular": true
+        }
+      }
+    ]
   }
 }
