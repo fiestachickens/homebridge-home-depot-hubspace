@@ -1,76 +1,89 @@
 import axios from 'axios';
-import { TokenResponse } from '../responses/token-response';
 import { Endpoints } from '../api/endpoints';
+import { TokenResponse } from '../responses/token-response';
 
 /**
  * Service for managing JWT tokens
  */
-export class TokenService{
-    private static _instance: TokenService;
-
-    private readonly _httpClient = axios.create({
-        baseURL: Endpoints.ACCOUNT_BASE_URL
-    });
+class TokenService {
+    public loginBuffer: number = 60;
+    private _refreshInterval?: NodeJS.Timeout;
+    private readonly _httpClient = axios.create({ baseURL: Endpoints.ACCOUNT_BASE_URL });
 
     private _accessToken?: string;
     private _accessTokenExpiration?: Date;
     private _refreshToken?: string;
     private _refreshTokenExpiration?: Date;
+    private _username: string = '';
+    private _password: string = '';
+    private _authenticatingPromise?: Promise<boolean>;
 
     /**
      * Creates a new instance of token service
-     * @param _username Account username
-     * @param _password Account password
      */
-    private constructor(
-        private readonly _username: string,
-        private readonly _password: string) { }
-
-
-    /**
-     * {@link TokenService} instance
-     */
-    public static get instance(): TokenService{
-        return TokenService._instance;
-    }
+    constructor() { }
 
     /**
      * Initializes {@link TokenService}
-     * @param _username Account username
-     * @param _password Account password
+     * @param username Account username
+     * @param password Account password
      */
-    public static init(username: string, password: string): void{
-        TokenService._instance = new TokenService(username, password);
+    public login(username: string, password: string): void {
+        this._username = username;
+        this._password = password;
     }
 
-    public async getToken(): Promise<string | undefined>{
-        if(!this.hasValidToken()){
-            await this.authenticate();
+    public async getToken(): Promise<string | undefined> {
+        if (!this.hasValidToken()) {
+            await this.authenticate();  // will deduplicate automatically now
         }
 
         return this._accessToken;
     }
 
-    public hasValidToken(): boolean{
+    public hasValidToken(): boolean {
         return this._accessToken !== undefined && !this.isAccessTokenExpired();
     }
 
-    private async authenticate(): Promise<boolean>{
-        // If nothing is expired then no need to run authentication again
-        if(!this.isAccessTokenExpired() && !this.isRefreshTokenExpired()) return true;
+    private startAutoRefresh(): void {
+        if (this._refreshInterval) {
+            clearInterval(this._refreshInterval);
+        }
 
-        const tokenResponse = await this.getTokenFromRefreshToken() || await this.getTokenFromCredentials();
+        this._refreshInterval = setInterval(async () => {
+            const bufferTime = this.loginBuffer * 1000; // minutes before expiration
+            const now = new Date().getTime();
+            const exp = this._refreshTokenExpiration?.getTime() ?? 0;
 
-        this.setTokens(tokenResponse);
-
-        if(!tokenResponse) return false;
-
-        return true;
+            if (exp - now < bufferTime) {
+                await this.authenticate();
+            }
+        }, 30 * 1000); // check every 30 seconds
     }
 
-    private async getTokenFromRefreshToken(): Promise<TokenResponse | undefined>{
+    private async authenticate(): Promise<boolean> {
+        if (this._authenticatingPromise) {
+            // If already authenticating, reuse it
+            return this._authenticatingPromise;
+        }
+
+        this._authenticatingPromise = (async () => {
+            if (!this.isAccessTokenExpired() && !this.isRefreshTokenExpired()) return true;
+            const tokenResponse = await this.getTokenFromRefreshToken() || await this.getTokenFromCredentials();
+            this.setTokens(tokenResponse);
+            return !!tokenResponse;
+        })();
+
+        try {
+            return await this._authenticatingPromise;
+        } finally {
+            this._authenticatingPromise = undefined;  // clear once finished
+        }
+    }
+
+    private async getTokenFromRefreshToken(): Promise<TokenResponse | undefined> {
         // If refresh token is expired then don't even try...
-        if(this.isRefreshTokenExpired()) return undefined;
+        if (this.isRefreshTokenExpired()) return undefined;
 
         const params = new URLSearchParams();
 
@@ -78,16 +91,15 @@ export class TokenService{
         params.append('client_id', 'hubspace_android');
         params.append('refresh_token', this._refreshToken!);
 
-        try{
+        try {
             const response = await this._httpClient.post('/protocol/openid-connect/token', params);
-
             return response.status === 200 ? response.data : undefined;
-        }catch(exception){
+        } catch {
             return undefined;
         }
     }
 
-    private async getTokenFromCredentials(): Promise<TokenResponse | undefined>{
+    private async getTokenFromCredentials(): Promise<TokenResponse | undefined> {
         const params = new URLSearchParams();
 
         params.append('grant_type', 'password');
@@ -95,11 +107,11 @@ export class TokenService{
         params.append('username', this._username);
         params.append('password', this._password);
 
-        try{
+        try {
             const response = await this._httpClient.post('/protocol/openid-connect/token', params);
 
             return response.status === 200 ? response.data : undefined;
-        }catch(exception){
+        } catch {
             return undefined;
         }
     }
@@ -109,8 +121,8 @@ export class TokenService{
      * Sets tokens to new values
      * @param response Response with tokens
      */
-    private setTokens(response?: TokenResponse): void{
-        if(!response){
+    private setTokens(response?: TokenResponse): void {
+        if (!response) {
             this.clearTokens();
             return;
         }
@@ -122,23 +134,31 @@ export class TokenService{
 
         this._accessTokenExpiration = new Date(currentDate.getTime() + response.expires_in * 1000);
         this._refreshTokenExpiration = new Date(currentDate.getTime() + response.refresh_expires_in * 1000);
+
+        this.startAutoRefresh();
     }
+
 
     /**
      * Clears stored tokens
      */
-    private clearTokens(): void{
+    private clearTokens(): void {
         this._accessToken = undefined;
         this._refreshToken = undefined;
         this._accessTokenExpiration = undefined;
         this._refreshTokenExpiration = undefined;
+
+        if (this._refreshInterval) {
+            clearInterval(this._refreshInterval);
+            this._refreshInterval = undefined;
+        }
     }
 
     /**
      * Checks whether the access token is expired
      * @returns True if access token is expired otherwise false
      */
-    private isAccessTokenExpired(): boolean{
+    private isAccessTokenExpired(): boolean {
         return !this._accessTokenExpiration || this._accessTokenExpiration < new Date();
     }
 
@@ -146,8 +166,10 @@ export class TokenService{
      * Checks whether the refresh token is expired
      * @returns True if refresh token is expired otherwise false
      */
-    private isRefreshTokenExpired(): boolean{
+    private isRefreshTokenExpired(): boolean {
         return !this._refreshTokenExpiration || this._refreshTokenExpiration < new Date();
     }
 
 }
+
+export const tokenService: TokenService = new TokenService();

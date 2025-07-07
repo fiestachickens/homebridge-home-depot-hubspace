@@ -1,9 +1,9 @@
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Characteristic, PlatformConfig } from 'homebridge';
-import { TokenService } from './services/token.service';
-import { AccountService } from './services/account.service';
-import { DiscoveryService } from './services/discovery.service';
-import { DeviceService } from './services/device.service';
+import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 import { isConfigValid } from './config';
+import { AccountService } from './services/account.service';
+import { DeviceService } from './services/device.service';
+import { DiscoveryService } from './services/discovery.service';
+import { tokenService } from './services/token.service';
 
 /**
  * HomebridgePlatform
@@ -24,12 +24,13 @@ export class HubspacePlatform implements DynamicPlatformPlugin {
         public readonly config: PlatformConfig,
         public readonly api: API
     ) {
-        if(!isConfigValid(config)){
+        if (!isConfigValid(config)) {
             this.log.error('Configuration is invalid. Platform will not start.');
             return;
         }
         // Init token service as singleton
-        TokenService.init(this.config.username, this.config.password);
+        tokenService.login(this.config.username, this.config.password);
+        tokenService.loginBuffer = this.config.loginBuffer;
         // Configure private services
         this._discoveryService = new DiscoveryService(this);
         // Configure global services
@@ -45,12 +46,12 @@ export class HubspacePlatform implements DynamicPlatformPlugin {
     }
 
     /**
-   * This function is invoked when homebridge restores cached accessories from disk at startup.
-   * It should be used to setup event handlers for characteristics and update respective values.
-   */
+     * This function is invoked when homebridge restores cached accessories from disk at startup.
+     * It should be used to setup event handlers for characteristics and update respective values.
+     */
     configureAccessory(accessory: PlatformAccessory) {
         // Do not restore cached accessories if there was an error during initialization
-        if(!this._isInitialized) return;
+        if (!this._isInitialized) return;
 
         this._discoveryService.configureCachedAccessory(accessory);
     }

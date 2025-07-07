@@ -1,7 +1,7 @@
 /**
  * HTTP response with device statuses for each attribute
  */
-export interface DeviceStatusResponse{
+export interface DeviceStatusResponse {
     deviceId: string;
     attributes: {
         id: number;

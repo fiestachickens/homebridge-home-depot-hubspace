@@ -1,7 +1,7 @@
 /**
  * Auth token response from HTTP server
  */
-export interface TokenResponse{
+export interface TokenResponse {
 
     /**
      * Auth access token

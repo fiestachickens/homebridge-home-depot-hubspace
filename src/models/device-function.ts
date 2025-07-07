@@ -3,7 +3,7 @@ import { FunctionCharacteristic } from './function-characteristic';
 /**
  * Device function
  */
-export interface DeviceFunction{
+export interface DeviceFunction {
     /**
      * Homebridge characteristic for the function
      */
@@ -32,7 +32,7 @@ export const NoDeviceFunction: DeviceFunction = {
  * @param deviceFunction Function to check
  * @returns True if function is NULL function
  */
-export function isNoFunction(deviceFunction: DeviceFunction): boolean{
+export function isNoFunction(deviceFunction: DeviceFunction): boolean {
     const noFcKeys = Object.keys(NoDeviceFunction);
     const fcToCheckKeys = Object.keys(deviceFunction);
 

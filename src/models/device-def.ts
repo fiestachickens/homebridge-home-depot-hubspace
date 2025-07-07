@@ -4,7 +4,7 @@ import { FunctionCharacteristic } from './function-characteristic';
 /**
  * Implemented device function definition
  */
-export interface DeviceFunctionDef{
+export interface DeviceFunctionDef {
     /**
      * Function class of Hubspace API
      */
@@ -18,7 +18,7 @@ export interface DeviceFunctionDef{
 /**
  * Implemented device definition
  */
-export interface DeviceDef{
+export interface DeviceDef {
     /**
      * Device class of Hubspace API
      */

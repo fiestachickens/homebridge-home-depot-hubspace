@@ -1,7 +1,7 @@
 /**
  * Type of a device
  */
-export enum DeviceType{
+export enum DeviceType {
     None = 'none',
     Light = 'light',
     Fan = 'fan',
@@ -14,8 +14,8 @@ export enum DeviceType{
  * @param key Device key
  * @returns {@link DeviceType} if key is found otherwise undefined
  */
-export function getDeviceTypeForKey(key: string): DeviceType{
-    switch(key){
+export function getDeviceTypeForKey(key: string): DeviceType {
+    switch (key) {
         case 'light':
             return DeviceType.Light;
         case 'fan':

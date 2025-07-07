@@ -1,10 +1,10 @@
 import { CharacteristicValue, PlatformAccessory } from 'homebridge';
+import { FunctionCharacteristic } from '../models/function-characteristic';
 import { HubspacePlatform } from '../platform';
 import { isNullOrUndefined } from '../utils';
 import { HubspaceAccessory } from './hubspace-accessory';
-import { FunctionCharacteristic } from '../models/function-characteristic';
 
-export class OutletAccessory extends HubspaceAccessory{
+export class OutletAccessory extends HubspaceAccessory {
 
     /**
      * Crates a new instance of the accessory
@@ -17,21 +17,21 @@ export class OutletAccessory extends HubspaceAccessory{
         this.configurePower();
     }
 
-    private configurePower(): void{
-        if(this.supportsCharacteristic(FunctionCharacteristic.Power)){
+    private configurePower(): void {
+        if (this.supportsCharacteristic(FunctionCharacteristic.Power)) {
             this.service.getCharacteristic(this.platform.Characteristic.On)
                 .onGet(this.getOn.bind(this))
                 .onSet(this.setOn.bind(this));
         }
     }
 
-    private async getOn(): Promise<CharacteristicValue>{
+    private async getOn(): Promise<CharacteristicValue> {
         const deviceFc = this.getFunctionForCharacteristics(FunctionCharacteristic.Power);
         // Try to get the value
         const value = await this.deviceService.getValueAsBoolean(this.device.deviceId, deviceFc);
 
         // If the value is not defined then show 'Not Responding'
-        if(isNullOrUndefined(value)){
+        if (isNullOrUndefined(value)) {
             throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
         }
 
@@ -39,7 +39,7 @@ export class OutletAccessory extends HubspaceAccessory{
         return value!;
     }
 
-    private async setOn(value: CharacteristicValue): Promise<void>{
+    private async setOn(value: CharacteristicValue): Promise<void> {
         const deviceFc = this.getFunctionForCharacteristics(FunctionCharacteristic.Power);
 
         await this.deviceService.setValue(this.device.deviceId, deviceFc, value);

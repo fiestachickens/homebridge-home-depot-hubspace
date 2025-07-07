@@ -3,7 +3,7 @@ import { DeviceFunctionResponse } from './device-function-response';
 /**
  * HTTP response for device discovery
  */
-export interface DeviceResponse{
+export interface DeviceResponse {
     id: string;
     deviceId: string;
     children: DeviceResponse[];

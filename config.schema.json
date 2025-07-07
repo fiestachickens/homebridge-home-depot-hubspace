@@ -24,6 +24,13 @@
         "required": true,
         "description": "Your Hubspace password",
         "placeholder": "Password"
+      },
+      "loginBuffer": {
+        "title": "Login Buffer Time",
+        "type": "integer",
+        "required": true,
+        "description": "Buffer time before token expiration (in seconds). Default is 300 seconds.",
+        "default": 300
       }
     }
   }

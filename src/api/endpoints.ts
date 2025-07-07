@@ -1,7 +1,7 @@
 /**
  * Class for constructing enpoints for HTTP client
  */
-export class Endpoints{
+export class Endpoints {
 
     /**
      * Base URL for account/token management

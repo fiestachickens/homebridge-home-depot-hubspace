@@ -5,10 +5,11 @@ import { PlatformConfig } from 'homebridge';
  * @param config Config object
  * @returns True if plugin configuration is valid otherwise false
  */
-export function isConfigValid(config: PlatformConfig): boolean{
+export function isConfigValid(config: PlatformConfig): boolean {
     return !(
         !config.username ||
         !config.password ||
-        !config.name
+        !config.name ||
+        !config.loginBuffer
     );
 }
