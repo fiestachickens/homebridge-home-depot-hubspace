@@ -13,6 +13,9 @@ Hubspace is a platform for range of devices sold at HomeDepot. This plugin tries
   
 <p>✅ This plugin is tested and compatible with Homebridge v2.0+</p>
 
+# Disclaimer
+I do not own any rights to Hubspace. Any work published here is solely for my own convenience. I am not making any guarantees about the code or products referenced here.
+
 <p>
   There are several Hubspace plugins available right now, all stemming from an original one.  I haven't seen one add Light Switches yet, so I created this one to add support for Light Switches.  Its history is:
   <ul>
@@ -22,9 +25,6 @@ Hubspace is a platform for range of devices sold at HomeDepot. This plugin tries
 </p>
   
 <p>If you have additional features from other versions of this plugin that you'd like incorporated, please let me know.</p>
-
-# Disclaimer
-I do not own any rights to Hubspace. Any work published here is solely for my own convenience. I am not making any guarantees about the code or products referenced here.
 
 # Tested products
 Below you can find a table of products that have been tested with this plugin. Some products share similarities among one another (e.g. lights), however, that does not guarantee that they will all work.
