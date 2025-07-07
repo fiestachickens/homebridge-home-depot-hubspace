@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "Hubspace",
+  "pluginAlias": "HomeDepotHubspace",
   "pluginType": "platform",
   "singular": true,
   "schema": {
@@ -9,7 +9,7 @@
         "title": "Name",
         "type": "string",
         "required": true,
-        "default": "Hubspace"
+        "default": "HomeDepotHubspace"
       },
       "username": {
         "title": "Username",
