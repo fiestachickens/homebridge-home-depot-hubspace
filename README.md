@@ -5,15 +5,19 @@
 <span align="center">
   
   # Homebridge Hubspace
-  
-  <a href="https://www.npmjs.com/homebridge-hubspace">
-    <img src="https://img.shields.io/npm/v/homebridge-hubspace.svg?logo=npm&logoColor=fff&label=NPM+package&color=limegreen" alt="Hubspace for Homebridge on npm" />
-  </a>
-  
-  <a href="https://github.com/homebridge/homebridge/wiki/Verified-Plugins">
-    <img title="Verified by Homebridge" src="https://badgen.net/badge/homebridge/verified/purple"/>
-  </a>
-  
+
+  <p>✅ This plugin is tested and compatible with Homebridge v2.0+</p>
+
+  <p>
+    There are several Hubspace plugins available right now, all stemming from an original one.  I haven't seen one add Light Switches yet, so I created this one to add support for Light Switches.  Its history is:
+    <ul>
+      <li>Original Repository: <a href="https://github.com/sajmonr/homebridge-hubspace" target="_blank">Sajmonr</a></li>
+      <li>Updated Repository (cleaner code, better token handling): <a href="https://github.com/JakeAi/homebridge-hubspace" target="_blank">JakeAi</a></li>
+    </ul>
+
+    If you have additional features from other versions of this plugin that you'd like incorporated, please let me know.
+   </p>
+
 </span>
 
 # About plugin

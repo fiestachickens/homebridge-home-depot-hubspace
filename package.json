@@ -1,24 +1,35 @@
 {
-  "displayName": "Homebridge Hubspace",
-  "name": "@ihz/homebridge-hubspace",
-  "version": "2.0.0-preview6",
+  "displayName": "Homebridge Hubspace by Home Depot",
+  "name": "homebridge-home-depot-hubspace",
+  "version": "2.0.0-preview1",
   "description": "Homebridge plugin for controlling Hubspace accessories.",
-  "homepage": "https://github.com/JakeAi/homebridge-hubspace#readme",
-  "author": "Adam Simonicek",
+  "homepage": "https://github.com/fiestachickens/homebridge-home-depot-hubspace",
+  "author": "Cyrus Keck",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JakeAi/homebridge-hubspace.git"
+    "url": "https://github.com/fiestachickens/homebridge-home-depot-hubspace"
   },
   "bugs": {
-    "url": "https://github.com/JakeAi/homebridge-hubspace/issues"
+    "url": "https://github.com/fiestachickens/homebridge-home-depot-hubspace/issues"
   },
   "engines": {
-    "node": ">=14.18.1",
-    "homebridge": ">=1.3.5"
+    "homebridge": ">=1.6.0",
+    "node": ">=18.0.0"
+  },
+  "homebridgePlugin": {
+    "platforms": [
+      {
+        "platform": "HomeDepotHubspace",
+        "plugin_map": {
+          "plugin_name": "homebridge-home-depot-hubspace",
+          "singular": true
+        }
+      }
+    ]
   },
   "main": "dist/index.js",
   "scripts": {
@@ -44,7 +55,7 @@
     "eslint": "^8.34.0",
     "homebridge": "^1.6.0",
     "nodemon": "^2.0.20",
-    "rimraf": "^4.1.2",
+    "rimraf": "^4.4.1",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
   }
