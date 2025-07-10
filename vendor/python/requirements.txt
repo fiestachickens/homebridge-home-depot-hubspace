@@ -1,2 +1,2 @@
-# Add any dependencies required by the vendored hubspace module here
-aioafero>=4
+aioafero==4.1.1
+asyncio==3.4.3

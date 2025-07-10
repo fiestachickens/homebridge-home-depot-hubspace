@@ -1,9 +1,8 @@
 import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
-import { isConfigValid } from './config';
-import { AccountService } from './services/account.service';
+import { isConfigValid } from './helpers/config';
+import { PythonService } from './services/python.service';
 import { DeviceService } from './services/device.service';
 import { DiscoveryService } from './services/discovery.service';
-import { tokenService } from './services/token.service';
 
 /**
  * HomebridgePlatform
@@ -13,7 +12,7 @@ import { tokenService } from './services/token.service';
 export class HubspacePlatform implements DynamicPlatformPlugin {
     public readonly Service: typeof Service = this.api.hap.Service;
     public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
-    public readonly accountService!: AccountService;
+    public readonly pythonService!: PythonService;
     public readonly deviceService!: DeviceService;
 
     private readonly _discoveryService!: DiscoveryService;
@@ -28,18 +27,19 @@ export class HubspacePlatform implements DynamicPlatformPlugin {
             this.log.error('Configuration is invalid. Platform will not start.');
             return;
         }
-        // Init token service as singleton
-        tokenService.login(this.config.username, this.config.password);
-        tokenService.loginBuffer = this.config.loginBuffer;
+
+        // TODO: Come back to me
         // Configure private services
         this._discoveryService = new DiscoveryService(this);
+
         // Configure global services
-        this.accountService = new AccountService(log);
+        this.pythonService = new PythonService(this.log, this.config);
         this.deviceService = new DeviceService(this);
 
         // Configure callbacks
-        this.accountService.onAccountLoaded(this._discoveryService.discoverDevices.bind(this._discoveryService));
-        this.api.on('didFinishLaunching', async () => this.accountService.loadAccount());
+        // TODO: Do this, but use our pythonbridge instead, exact same logic
+        this.pythonService.setOnBridgeLoaded(this._discoveryService.discoverDevices.bind(this._discoveryService));
+        this.api.on('didFinishLaunching', async () => this.pythonService.loadBridge());
 
         // Mark platform as initialized
         this._isInitialized = true;

@@ -1,8 +1,6 @@
 import { AxiosError } from 'axios';
 import { PlatformAccessory } from 'homebridge';
 import { createAccessoryForDevice } from '../accessories/device-accessory-factory';
-import { Endpoints } from '../api/endpoints';
-import { createHttpClientWithBearerInterceptor } from '../api/http-client-factory';
 import { Devices } from '../hubspace-devices';
 import { Device } from '../models/device';
 import { DeviceDef, DeviceFunctionDef } from '../models/device-def';
@@ -17,13 +15,6 @@ import { PLATFORM_NAME, PLUGIN_NAME } from '../settings';
  * Service for discovering and managing devices
  */
 export class DiscoveryService {
-    private readonly _httpClient = createHttpClientWithBearerInterceptor({
-        baseURL: Endpoints.API_BASE_URL,
-        headers: {
-            host: 'semantics2.afero.net'
-        }
-    });
-
     private _cachedAccessories: PlatformAccessory[] = [];
 
     constructor(private readonly _platform: HubspacePlatform) { }
@@ -41,26 +32,31 @@ export class DiscoveryService {
      * Discovers new devices
      */
     async discoverDevices() {
-        const devices = await this.getDevicesForAccount();
+      this._platform.log.info('got here');
+      return;
 
-        // loop over the discovered devices and register each one if it has not already been registered
-        for (const device of devices) {
-            // see if an accessory with the same uuid has already been registered and restored from
-            // the cached devices we stored in the `configureAccessory` method above
-            const existingAccessory = this._cachedAccessories.find(accessory => accessory.UUID === device.uuid);
+      /*
+      const devices = await this.getDevicesForAccount();
 
-            if (existingAccessory) {
-                // the accessory already exists
-                this._platform.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-                this.registerCachedAccessory(existingAccessory, device);
-            } else {
-                // the accessory does not yet exist, so we need to create it
-                this._platform.log.info('Adding new accessory:', device.name);
-                this.registerNewAccessory(device);
-            }
-        }
+      // loop over the discovered devices and register each one if it has not already been registered
+      for (const device of devices) {
+          // see if an accessory with the same uuid has already been registered and restored from
+          // the cached devices we stored in the `configureAccessory` method above
+          const existingAccessory = this._cachedAccessories.find(accessory => accessory.UUID === device.uuid);
 
-        this.clearStaleAccessories(this._cachedAccessories.filter(a => !devices.some(d => d.uuid === a.UUID)));
+          if (existingAccessory) {
+              // the accessory already exists
+              this._platform.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+              this.registerCachedAccessory(existingAccessory, device);
+          } else {
+              // the accessory does not yet exist, so we need to create it
+              this._platform.log.info('Adding new accessory:', device.name);
+              this.registerNewAccessory(device);
+          }
+      }
+
+      this.clearStaleAccessories(this._cachedAccessories.filter(a => !devices.some(d => d.uuid === a.UUID)));
+      */
     }
 
     private clearStaleAccessories(staleAccessories: PlatformAccessory[]): void {
@@ -95,6 +91,9 @@ export class DiscoveryService {
     }
 
     private async getDevicesForAccount(): Promise<Device[]> {
+      return [];
+
+        /*
         try {
             const response = await this._httpClient
                 .get<DeviceResponse[]>(`accounts/${this._platform.accountService.accountId}/metadevices`);
@@ -109,6 +108,7 @@ export class DiscoveryService {
             this._platform.log.error('Failed to get devices for account.', (<AxiosError>ex).message);
             return [];
         }
+        */
     }
 
     private mapDeviceResponseToModel(response: DeviceResponse): Device[] {

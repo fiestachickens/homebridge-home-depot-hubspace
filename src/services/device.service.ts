@@ -1,9 +1,9 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { CharacteristicValue } from 'homebridge';
-import { Endpoints } from '../api/endpoints';
-import { createHttpClientWithBearerInterceptor } from '../api/http-client-factory';
 import { DeviceFunction, isNoFunction } from '../models/device-function';
 import { HubspacePlatform } from '../platform';
+
+// TODO: Drop me too
 import { isAferoError } from '../responses/afero-error-response';
 import { DeviceStatusResponse } from '../responses/device-status-response';
 import { convertNumberToHex } from '../utils';
@@ -12,11 +12,6 @@ import { convertNumberToHex } from '../utils';
  * Service for interacting with devices
  */
 export class DeviceService {
-
-    private readonly _httpClient = createHttpClientWithBearerInterceptor({
-        baseURL: Endpoints.API_BASE_URL
-    });
-
 
     constructor(private readonly _platform: HubspacePlatform) { }
 
@@ -27,6 +22,7 @@ export class DeviceService {
      * @param value Value to set to attribute
      */
     async setValue(deviceId: string, deviceFunction: DeviceFunction, value: CharacteristicValue): Promise<void> {
+        /*
         let response: AxiosResponse;
 
         if (isNoFunction(deviceFunction)) {
@@ -48,6 +44,7 @@ export class DeviceService {
         if (response.status === 200) return;
 
         this._platform.log.error(`Remote server did not accept new value ${value} for device (ID: ${deviceId}).`);
+        */
     }
 
     /**
@@ -57,6 +54,8 @@ export class DeviceService {
      * @returns Data value
      */
     async getValue(deviceId: string, deviceFunction: DeviceFunction): Promise<CharacteristicValue | undefined> {
+      return false;
+        /*
         let deviceStatus: DeviceStatusResponse;
 
         if (isNoFunction(deviceFunction)) {
@@ -82,6 +81,7 @@ export class DeviceService {
         }
 
         return attributeResponse.value;
+        */
     }
 
     /**

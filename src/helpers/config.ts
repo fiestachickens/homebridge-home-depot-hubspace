@@ -9,7 +9,6 @@ export function isConfigValid(config: PlatformConfig): boolean {
     return !(
         !config.username ||
         !config.password ||
-        !config.name ||
-        !config.loginBuffer
+        !config.name
     );
 }
