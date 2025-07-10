@@ -1,0 +1,2 @@
+# Add any dependencies required by the vendored hubspace module here
+aioafero>=4
