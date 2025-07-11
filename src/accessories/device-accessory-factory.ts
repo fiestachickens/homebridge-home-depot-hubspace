@@ -17,16 +17,16 @@ import { SwitchAccessory } from './switch-accessory';
  * @throws If device type is not supported
  */
 export function createAccessoryForDevice(device: Device, platform: HubspacePlatform, accessory: PlatformAccessory): HubspaceAccessory {
-    switch (device.type) {
-        case DeviceType.Light:
-            return new LightAccessory(platform, accessory);
-        case DeviceType.Fan:
-            return new FanAccessory(platform, accessory);
-        case DeviceType.Outlet:
-            return new OutletAccessory(platform, accessory);
-        case DeviceType.Switch:
-            return new SwitchAccessory(platform, accessory);
-        default:
-            throw new Error(`Accessory of type '${device.type}' is not supported.`);
-    }
+  switch (device.type) {
+    case DeviceType.Light:
+      return new LightAccessory(platform, accessory);
+    case DeviceType.Fan:
+      return new FanAccessory(platform, accessory);
+    case DeviceType.Outlet:
+      return new OutletAccessory(platform, accessory);
+    case DeviceType.Switch:
+      return new SwitchAccessory(platform, accessory);
+    default:
+      throw new Error(`Accessory of type '${device.type}' is not supported.`);
+  }
 }

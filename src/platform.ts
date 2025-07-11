@@ -52,7 +52,7 @@ export class HubspacePlatform implements DynamicPlatformPlugin {
         if (!this._isInitialized) return;
 
         if (this.config.doDebugLogging) {
-          this.log.info(`[ DEBUG ]: Restoring accessory from cache: ${JSON.stringify(accessory)}`);
+          this.log.info(`[ DEBUG ]: Restoring accessory from cache: ${accessory}`);
         }
 
         this._discoveryService.configureCachedAccessory(accessory);
