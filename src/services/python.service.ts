@@ -29,30 +29,8 @@ export class PythonService {
           this.log.info("[ DEBUG ]: Getting devices...");
         }
 
-        // TODO: Move this out to the discovery service
-        const res = await this._bridge.getDevices();
 
-        if (this.config.doDebugLogging) {
-          this.log.info(`[ DEBUG ]: Initial Devices: ${JSON.stringify(res)}`);
-        }
-
-        if (!res) {
-          this.log.info(`No devices returned: ${JSON.stringify(res)}`);
-          return;
-        }
-
-        /*
-        res.forEach((device: any) => {
-          switch (device.type) {
-            case "switch":
-              this.configureSwitch(device);
-              break;
-            default:
-              this.log.warn(`Unsupported device type: ${device.type}`);
-          }
-        });
-        */
-
+        // TODO: This may need to go out to the discovery service
         /*
         // Configure polling
         setInterval(async () => {
@@ -76,6 +54,16 @@ export class PythonService {
       } catch (err) {
         this.log.error('Error initializing Hubspace plugin:', err);
         throw err;
+      }
+    }
+
+    async getDevices() {
+      try {
+        const response = await this._bridge.getDevices();
+        return response.devices;
+      } catch (err) {
+          this.log.error('Failed to get devices from Python.', err);
+          throw err;
       }
     }
 

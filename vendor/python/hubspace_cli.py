@@ -3,6 +3,7 @@ import json
 import signal
 import sys
 from aioafero import v1
+from utils import extract_functions
 
 shutdown_event = asyncio.Event()
 
@@ -37,9 +38,13 @@ class HubspaceCLI:
                 devices.append({
                     "id": d.id,
                     "device_id": d.id,
-                    "default_name": d.device_information.default_name,
+                    "defaultName": d.device_information.default_name,
                     "name": d.device_information.name,
+                    "friendlyName": d.device_information.name,
+                    "manufacturer": d.device_information.manufacturer,
+                    "model": d.device_information.model,
                     "type": d.device_information.device_class,
+                    "functions": extract_functions(d),
                     "state": {
                         "power": d.on.get(None).on if d.on.get(None) else None
                     }
@@ -47,7 +52,7 @@ class HubspaceCLI:
 
             # TODO: Add other types
 
-            return devices
+            return { "devices": devices }
         elif cmd == "set_switch":
             device_id = command.get("device_id")
             new_state = command.get("state")  # Should be "on" or "off"

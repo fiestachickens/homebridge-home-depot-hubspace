@@ -32,11 +32,16 @@ export class DiscoveryService {
      * Discovers new devices
      */
     async discoverDevices() {
-      this._platform.log.info('got here');
-      return;
+      if (this._platform.config.doDebugLogging) {
+        this._platform.log.info('[ DEBUG ]: Discovering devices...');
+      }
 
-      /*
-      const devices = await this.getDevicesForAccount();
+      const devices = await this.getDevicesFromPython();
+
+      if (!devices || devices.length === 0) {
+        this._platform.log.info(`No devices discovered`);
+        return;
+      }
 
       // loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
@@ -56,7 +61,6 @@ export class DiscoveryService {
       }
 
       this.clearStaleAccessories(this._cachedAccessories.filter(a => !devices.some(d => d.uuid === a.UUID)));
-      */
     }
 
     private clearStaleAccessories(staleAccessories: PlatformAccessory[]): void {
@@ -74,82 +78,87 @@ export class DiscoveryService {
     }
 
     private registerCachedAccessory(accessory: PlatformAccessory, device: Device): void {
-        accessory.context.device = device;
-        this._platform.api.updatePlatformAccessories([accessory]);
+      accessory.context.device = device;
+      this._platform.api.updatePlatformAccessories([accessory]);
 
-        createAccessoryForDevice(device, this._platform, accessory);
+      createAccessoryForDevice(device, this._platform, accessory);
     }
 
     private registerNewAccessory(device: Device): void {
-        const accessory = new this._platform.api.platformAccessory(device.name, device.uuid);
+      const accessory = new this._platform.api.platformAccessory(device.name, device.uuid);
 
-        accessory.context.device = device;
+      accessory.context.device = device;
 
-        createAccessoryForDevice(device, this._platform, accessory);
+      createAccessoryForDevice(device, this._platform, accessory);
 
-        this._platform.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this._platform.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
     }
 
-    private async getDevicesForAccount(): Promise<Device[]> {
-      return [];
+    private async getDevicesFromPython(): Promise<Device[]> {
+      const devices = await this._platform.pythonService.getDevices();
 
-        /*
-        try {
-            const response = await this._httpClient
-                .get<DeviceResponse[]>(`accounts/${this._platform.accountService.accountId}/metadevices`);
-
-            // Get only leaf devices with type of 'device'
-            return response.data
-                .filter(d => d.children.length === 0 && d.typeId === 'metadevice.device')
-                .map(this.mapDeviceResponseToModel.bind(this))
-                .filter(d => d.length > 0)
-                .flat();
-        } catch (ex) {
-            this._platform.log.error('Failed to get devices for account.', (<AxiosError>ex).message);
-            return [];
-        }
-        */
+      return devices
+          .map(this.mapDeviceResponseToModel.bind(this))
+          .filter(d => d.length > 0)
+          .flat();
     }
 
-    private mapDeviceResponseToModel(response: DeviceResponse): Device[] {
-        const type = getDeviceTypeForKey(response.description.device.deviceClass);
-        const deviceDef = Devices.find(d => d.deviceType === type);
+    private mapDeviceResponseToModel(rawDevice: any): Device[] {
+      const type = getDeviceTypeForKey(rawDevice.type);
+      const deviceDef = Devices.find(d => d.deviceType === type);
 
-        if (!deviceDef) return [];
-
-        const supportedFunctions = this.findSupportedFunctionsForDevice(deviceDef, response.description.functions);
-        const devices: Device[] = [];
-
-        for (const supportedFc of supportedFunctions) {
-            // Try to find a device that does NOT contain the same characteristic
-            const exisingDevice = devices.find(d => !d.functions.some(df => df.characteristic === supportedFc.characteristic));
-
-            // If the device already exists then just add the function to it
-            if (exisingDevice) {
-                exisingDevice.functions.push(supportedFc);
-            } else {
-                // Otherwise create a new device for it
-                const defaultName = response.friendlyName;
-                const nameQualifier = supportedFc.functionInstance ?? devices.length;
-                const newName = devices.some(d => d.name === defaultName) ? `${defaultName} (${nameQualifier})` : defaultName;
-
-                // Make sure UUID is generated as many times as there are 'virtual' devices for each device
-                // because they all have the same device ID
-                devices.push({
-                    uuid: this.generatedUuid(response.id, devices.length + 1),
-                    deviceId: response.deviceId,
-                    name: newName,
-                    type: type,
-                    manufacturer: response.description.device.manufacturerName,
-                    model: response.description.device.model.split(',').map(m => m.trim()),
-                    functions: [supportedFc]
-                });
-
-            }
-
+      if (!deviceDef) {
+        if (this._platform.config.doDebugLogging) {
+          this._platform.log.info(`[ DEBUG ]: Type ${type} was not found; not initializing.`);
         }
 
-        return devices;
+        return [];
+      }
+
+      const supportedFunctions = this.findSupportedFunctionsForDevice(deviceDef, rawDevice.functions);
+      const devices: Device[] = [];
+
+      for (const supportedFc of supportedFunctions) {
+        // Try to find a device that does NOT contain the same characteristic
+        const exisingDevice = devices.find(d => !d.functions.some(df => df.characteristic === supportedFc.characteristic));
+
+        // If the device already exists then just add the function to it
+        if (exisingDevice) {
+          exisingDevice.functions.push(supportedFc);
+        } else {
+          // Otherwise create a new device for it
+          const defaultName = rawDevice.friendlyName;
+          const nameQualifier = supportedFc.functionInstance ?? devices.length;
+          const newName = devices.some(d => d.name === defaultName) ? `${defaultName} (${nameQualifier})` : defaultName;
+
+          // Make sure UUID is generated as many times as there are 'virtual' devices for each device
+          // because they all have the same device ID
+          devices.push({
+            uuid: this.generatedUuid(rawDevice.id, devices.length + 1),
+            deviceId: rawDevice.deviceId,
+            name: newName,
+            type: type,
+            manufacturer: rawDevice.manufacturer,
+            model: rawDevice.model.split(',').map(m => m.trim()),
+            functions: [supportedFc]
+          });
+        }
+      }
+
+      if (this._platform.config.doDebugLogging) {
+        let output = 
+        this._platform.log.info("[ DEBUG ]: Mapped Devices:");
+        this._platform.log.info("      ----------------------------");
+
+        devices.forEach((device: any) => {
+          this._platform.log.info(`          Device: ${JSON.stringify(device)}`);
+        });
+
+        this._platform.log.info("      ----------------------------");
+        this._platform.log.info(" ");
+      }
+
+      return devices;
     }
 
     /**

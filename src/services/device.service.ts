@@ -2,11 +2,11 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { CharacteristicValue } from 'homebridge';
 import { DeviceFunction, isNoFunction } from '../models/device-function';
 import { HubspacePlatform } from '../platform';
+import { convertNumberToHex } from '../utils';
 
 // TODO: Drop me too
 import { isAferoError } from '../responses/afero-error-response';
 import { DeviceStatusResponse } from '../responses/device-status-response';
-import { convertNumberToHex } from '../utils';
 
 /**
  * Service for interacting with devices

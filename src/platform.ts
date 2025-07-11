@@ -28,7 +28,6 @@ export class HubspacePlatform implements DynamicPlatformPlugin {
             return;
         }
 
-        // TODO: Come back to me
         // Configure private services
         this._discoveryService = new DiscoveryService(this);
 
@@ -37,7 +36,6 @@ export class HubspacePlatform implements DynamicPlatformPlugin {
         this.deviceService = new DeviceService(this);
 
         // Configure callbacks
-        // TODO: Do this, but use our pythonbridge instead, exact same logic
         this.pythonService.setOnBridgeLoaded(this._discoveryService.discoverDevices.bind(this._discoveryService));
         this.api.on('didFinishLaunching', async () => this.pythonService.loadBridge());
 
@@ -52,6 +50,10 @@ export class HubspacePlatform implements DynamicPlatformPlugin {
     configureAccessory(accessory: PlatformAccessory) {
         // Do not restore cached accessories if there was an error during initialization
         if (!this._isInitialized) return;
+
+        if (this.config.doDebugLogging) {
+          this.log.info(`[ DEBUG ]: Restoring accessory from cache: ${JSON.stringify(accessory)}`);
+        }
 
         this._discoveryService.configureCachedAccessory(accessory);
     }
